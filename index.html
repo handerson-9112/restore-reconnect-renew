@@ -5,45 +5,636 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Restore, Reconnect, Renew</title>
   <style>
+    :root {
+      --cream: #fff8ef;
+      --sage: #dbe9df;
+      --sage-dark: #557466;
+      --peach: #ffd8bd;
+      --lavender: #e8ddf7;
+      --sky: #dceefa;
+      --gold: #ffe8a3;
+      --ink: #26332f;
+      --muted: #5e6b66;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(38, 51, 47, 0.10);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f8f3ec;
-      color: #2f3a35;
-      max-width: 800px;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, var(--cream), var(--sky));
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1050px;
       margin: 0 auto;
-      padding: 40px 20px;
-      line-height: 1.6;
+      padding: 32px 18px 60px;
     }
-    .card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+
+    header {
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 30px;
+      padding: 34px 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      margin-bottom: 22px;
     }
+
     h1 {
-      color: #5f7f73;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4rem);
+      color: var(--sage-dark);
+      letter-spacing: -1px;
     }
-    button {
-      background: #f0b88f;
-      border: none;
-      border-radius: 999px;
-      padding: 12px 20px;
-      font-size: 16px;
+
+    .tagline {
+      font-size: 1.15rem;
+      margin: 12px auto 8px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .soft {
+      color: var(--muted);
+      margin: 0 auto;
+      max-width: 700px;
+    }
+
+    .privacy {
+      margin-top: 14px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.88);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin: 18px 0;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--sage-dark);
+      font-size: 1.55rem;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .needs-grid {
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    }
+
+    .energy-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .board-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .board-grid.more {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 700px) {
+      .board-grid,
+      .board-grid.more {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    button, .choice-card {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 1rem;
       cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
     }
-    button:hover {
-      background: #e5a67b;
+
+    button:hover, .choice-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(38, 51, 47, 0.12);
+    }
+
+    button:focus, textarea:focus {
+      outline: 3px solid #8eb6a2;
+      outline-offset: 2px;
+    }
+
+    .choice-card {
+      background: var(--white);
+      border: 2px solid transparent;
+      text-align: left;
+      min-height: 72px;
+    }
+
+    .choice-card.selected {
+      border-color: var(--sage-dark);
+      background: var(--sage);
+    }
+
+    .primary {
+      background: var(--sage-dark);
+      color: white;
+      font-weight: 700;
+    }
+
+    .secondary {
+      background: var(--peach);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .ghost {
+      background: var(--white);
+      color: var(--ink);
+      border: 2px solid var(--sage);
+      font-weight: 700;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .care-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 18px;
+      min-height: 160px;
+      border: 2px solid #eef3ef;
+    }
+
+    .care-card:nth-child(4n+1) { background: #fffdf6; }
+    .care-card:nth-child(4n+2) { background: #f4fbff; }
+    .care-card:nth-child(4n+3) { background: #fff3ea; }
+    .care-card:nth-child(4n+4) { background: #f7f1ff; }
+
+    .icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .care-title {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--sage-dark);
+    }
+
+    .care-desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      border-radius: 18px;
+      border: 2px solid #dde8e0;
+      padding: 16px;
+      font-size: 1rem;
+      resize: vertical;
+      background: #fffefa;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .chip {
+      background: var(--lavender);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 0.92rem;
+    }
+
+    .message-box {
+      background: #fffefa;
+      border: 2px dashed #d7c7a4;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 12px;
+      min-height: 78px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .print-title {
+      display: none;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      header, .section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+
+      .no-print,
+      #checkIn,
+      #connectionSection,
+      .privacy,
+      .button-row,
+      .chips {
+        display: none !important;
+      }
+
+      .container {
+        padding: 0;
+        max-width: 100%;
+      }
+
+      .print-title {
+        display: block;
+        text-align: center;
+        margin-bottom: 12px;
+      }
+
+      textarea {
+        min-height: 220px;
+      }
+
+      .board-grid,
+      .board-grid.more {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Restore, Reconnect, Renew</h1>
-    <p><strong>Small care choices for educators — no pressure, no perfection.</strong></p>
-    <p>Choose what fits. Skip what does not. Rest counts.</p>
-    <button onclick="alert('Your app is live! Next, we will add the choice board.')">
-      Start a Care Check-In
-    </button>
-  </main>
+  <div class="container">
+    <header>
+      <h1>Restore, Reconnect, Renew</h1>
+      <p class="tagline">Small care choices for educators — no pressure, no perfection.</p>
+      <p class="soft">Choose what fits. Skip what does not. Rest counts.</p>
+      <p class="privacy">Privacy note: Your choices stay on this device. This app does not require login or collect personal information.</p>
+      <div class="button-row no-print" style="justify-content:center;">
+        <button class="primary" onclick="document.getElementById('checkIn').scrollIntoView({behavior:'smooth'})">Start a Care Check-In</button>
+        <button class="secondary" onclick="surpriseMe()">Surprise Me With One Practice</button>
+        <button class="ghost" onclick="generateBoard(); document.getElementById('boardSection').scrollIntoView({behavior:'smooth'})">Make a Printable Board</button>
+      </div>
+    </header>
+
+    <section class="section no-print" id="checkIn">
+      <h2>Care Check-In</h2>
+
+      <h3>What could you use today?</h3>
+      <div class="grid needs-grid" id="needButtons"></div>
+
+      <h3 style="margin-top:22px;">What feels realistic?</h3>
+      <div class="grid energy-grid" id="energyButtons"></div>
+
+      <div class="button-row">
+        <button class="primary" onclick="generateBoard()">Create My Care Board</button>
+        <button class="secondary" onclick="surpriseMe()">Surprise Me</button>
+      </div>
+    </section>
+
+    <section class="section" id="boardSection">
+      <div class="print-title">
+        <h1>Restore, Reconnect, Renew</h1>
+        <p>Choose what fits. Skip what does not. Rest counts.</p>
+      </div>
+
+      <h2>Your Care Board</h2>
+      <p class="soft">Start with one small choice. You do not have to do this perfectly.</p>
+
+      <div class="grid board-grid" id="board"></div>
+
+      <div class="button-row no-print">
+        <button class="ghost" onclick="generateBoard()">Refresh Choices</button>
+        <button class="ghost" onclick="toggleMoreChoices()" id="moreBtn">Show More Choices</button>
+        <button class="secondary" onclick="surpriseMe()">Surprise Me</button>
+        <button class="ghost" onclick="saveBoard()">Save Board</button>
+        <button class="primary" onclick="window.print()">Print Board</button>
+      </div>
+    </section>
+
+    <section class="section" id="reflectionSection">
+      <h2>Doodle, Noodle, or Write</h2>
+      <p class="soft">What do you want to notice, release, remember, or try?</p>
+
+      <div class="chips no-print">
+        <button class="chip" onclick="insertPrompt('One thing I need today is… ')">One thing I need today is…</button>
+        <button class="chip" onclick="insertPrompt('One thing I am setting down is… ')">One thing I am setting down is…</button>
+        <button class="chip" onclick="insertPrompt('One small care choice I might try is… ')">One small care choice I might try is…</button>
+        <button class="chip" onclick="insertPrompt('A reminder I want to carry with me is… ')">A reminder I want to carry with me is…</button>
+        <button class="chip" onclick="insertPrompt('Something that helped, even a little, was… ')">Something that helped, even a little, was…</button>
+      </div>
+
+      <textarea id="reflection" placeholder="Sketch with words, jot a phrase, make a list, or let your thoughts noodle around. No pressure."></textarea>
+    </section>
+
+    <section class="section no-print" id="connectionSection">
+      <h2>Send a Connection Note</h2>
+      <p class="soft">A small message can help someone feel less alone. Copy, personalize, and send only if it fits.</p>
+
+      <div class="grid energy-grid" id="messageButtons"></div>
+
+      <div class="message-box" id="messageBox">
+        Choose a note type to generate a message.
+      </div>
+
+      <div class="button-row">
+        <button class="primary" onclick="copyMessage()">Copy Message</button>
+      </div>
+    </section>
+
+    <p class="footer">
+      Source: Adapted from trauma-resilient education principles and Universal Design for Learning practices.
+    </p>
+  </div>
+
+  <script>
+    const needs = ["Rest", "Quiet", "Movement", "Joy", "Reflection", "Boundaries", "Connection", "Encouragement", "Reset", "I’m not sure"];
+    const energies = ["1 minute", "5 minutes", "15 minutes", "Something slower", "Browse only"];
+
+    let selectedNeed = "Reset";
+    let selectedEnergy = "5 minutes";
+    let showMore = false;
+    let currentBoard = [];
+
+    const practices = {
+      "Rest": [
+        ["☁️", "Rest without earning it.", "Let rest be allowed before everything is finished."],
+        ["🌙", "Choose sleep over one more email.", "One more task can wait. Your body matters."],
+        ["🪑", "Sit down before starting the next task.", "Give yourself a real pause between demands."],
+        ["🍵", "Let one non-urgent thing wait.", "Not everything needs your attention today."],
+        ["🧺", "Lower one expectation.", "Choose enough over perfect."],
+        ["🛌", "Take a no-school block of time.", "Protect a small space that belongs to you."]
+      ],
+      "Quiet": [
+        ["🌬️", "Take three slow breaths.", "No need to close your eyes. Just breathe gently."],
+        ["🔕", "Turn off one notification.", "Reduce one source of noise."],
+        ["🕯️", "Sit in silence for one minute.", "Let quiet be enough."],
+        ["🌿", "Notice one thing that feels steady.", "Look around and find one neutral or calming thing."],
+        ["🚗", "Drive or sit without audio.", "Give your brain a quiet pocket of space."],
+        ["📵", "Step away from screens.", "Try one screen-free minute."]
+      ],
+      "Movement": [
+        ["👟", "Take a slow walk without tracking it.", "Move without measuring anything."],
+        ["🙆", "Stretch in a way that feels kind.", "No performance. Just care for your body."],
+        ["🤲", "Shake out your hands.", "Release a little tension from the day."],
+        ["💧", "Walk to get water.", "Let hydration and movement team up."],
+        ["☀️", "Stand in sun or shade.", "Let your body notice a change of place."],
+        ["🌀", "Roll your shoulders.", "Invite your muscles to unclench."]
+      ],
+      "Joy": [
+        ["🎵", "Make a playlist for the mood you want.", "Let music support the shift you need."],
+        ["🎨", "Do something creative with no goal.", "Make something that does not need to be good."],
+        ["📸", "Notice one beautiful thing.", "Take a photo or simply let yourself see it."],
+        ["🧩", "Return to an old hobby.", "Reconnect with a part of you beyond work."],
+        ["😂", "Choose one small laugh.", "Watch, read, or remember something funny."],
+        ["🍓", "Choose one small delight.", "Let a tiny joy count."]
+      ],
+      "Reflection": [
+        ["⭐", "Name one thing you are proud of.", "Small wins are still wins."],
+        ["🍂", "Name one thing you are allowed to set down.", "You do not have to carry everything forward."],
+        ["📝", "Make a ‘not now’ list.", "Write it down so your brain can stop holding it."],
+        ["💌", "Write a note to your future self.", "Offer your future self a little kindness."],
+        ["🔎", "Ask: What did this season ask of me?", "Notice without judging yourself."],
+        ["🌱", "Name one way you grew.", "Growth can be quiet and unfinished."]
+      ],
+      "Boundaries": [
+        ["⏰", "Choose one time you will not check email.", "Protect one edge of your day."],
+        ["🛑", "Say no, not now, or not alone.", "Boundaries can be simple and kind."],
+        ["✅", "Decide what ‘enough’ looks like today.", "Name the finish line before it moves."],
+        ["📦", "Protect one small block of personal time.", "Put one pocket of time back in your hands."],
+        ["🧠", "Close one open tab, literal or mental.", "Release one thing from active attention."],
+        ["🌉", "Let tomorrow have tomorrow’s work.", "Not everything has to cross into today."]
+      ],
+      "Connection": [
+        ["📱", "Send a gratitude text.", "Name one thing you appreciated about someone."],
+        ["👂", "Ask someone to listen, not fix.", "Clear requests can make support easier."],
+        ["☕", "Plan a no-work conversation.", "Connect without making school the center."],
+        ["🌟", "Share one small win with someone who gets it.", "Let someone celebrate with you."],
+        ["🤝", "Make a boundary buddy pact.", "Remind each other not to overwork."],
+        ["💬", "Check in with no expectation of reply.", "Connection can be gentle and low-pressure."]
+      ],
+      "Encouragement": [
+        ["💛", "Write yourself a kind sentence.", "Try speaking to yourself like someone you care about."],
+        ["🌻", "Say: ‘This was hard, and I showed up.’", "Both parts can be true."],
+        ["💪", "Name one strength you used recently.", "Notice the capacity you already have."],
+        ["🪴", "Let small progress count.", "Tiny steps still move you."],
+        ["📬", "Save one positive note or memory.", "Let good moments be easier to find later."],
+        ["🧡", "Remember one life you impacted.", "You may not know the full ripple."]
+      ],
+      "Reset": [
+        ["💧", "Drink water before checking email.", "Begin with your body, not your inbox."],
+        ["🌤️", "Step outside and notice the sky.", "Let the world be bigger than the task list."],
+        ["🧠", "Close one open tab, literal or mental.", "Give your attention one less thing to hold."],
+        ["📝", "Put one task on a ‘not now’ list.", "Later is a valid plan."],
+        ["🌬️", "Take one slow breath.", "Start with one breath, then choose."],
+        ["🔄", "Reset one tiny space.", "Clear a corner, a desktop, or a single surface."]
+      ],
+      "I’m not sure": [
+        ["🪶", "Pick the gentlest option.", "When in doubt, choose less pressure."],
+        ["👀", "Browse without choosing.", "Looking is allowed. No action required."],
+        ["🌬️", "Take one slow breath.", "That can be the whole practice."],
+        ["❓", "Ask: What would help a little?", "A little is enough to begin."],
+        ["🧭", "Notice what you are not available for.", "Your limits are information."],
+        ["🌙", "Do the easiest kind thing.", "Start with the smallest care move."]
+      ]
+    };
+
+    const messages = {
+      "Gratitude": "Thinking about this season and wanted you to know: one thing I appreciated about you was ____.",
+      "Encouragement": "Just a reminder: you did meaningful work. I hope you get some real rest.",
+      "Check-in": "No need to respond right away, but I’m thinking of you. How are you really doing?",
+      "Boundary Buddy": "Want to be boundary buddies and remind each other not to overwork?",
+      "No-Work Invite": "Want to catch up sometime with a no-school-talk rule?"
+    };
+
+    function makeButtons() {
+      const needContainer = document.getElementById("needButtons");
+      const energyContainer = document.getElementById("energyButtons");
+      const messageContainer = document.getElementById("messageButtons");
+
+      needs.forEach(need => {
+        const btn = document.createElement("button");
+        btn.className = "choice-card" + (need === selectedNeed ? " selected" : "");
+        btn.textContent = need;
+        btn.onclick = () => {
+          selectedNeed = need;
+          updateSelections();
+        };
+        needContainer.appendChild(btn);
+      });
+
+      energies.forEach(energy => {
+        const btn = document.createElement("button");
+        btn.className = "choice-card" + (energy === selectedEnergy ? " selected" : "");
+        btn.textContent = energy;
+        btn.onclick = () => {
+          selectedEnergy = energy;
+          updateSelections();
+        };
+        energyContainer.appendChild(btn);
+      });
+
+      Object.keys(messages).forEach(type => {
+        const btn = document.createElement("button");
+        btn.className = "choice-card";
+        btn.textContent = type;
+        btn.onclick = () => generateMessage(type);
+        messageContainer.appendChild(btn);
+      });
+    }
+
+    function updateSelections() {
+      document.querySelectorAll("#needButtons .choice-card").forEach(btn => {
+        btn.classList.toggle("selected", btn.textContent === selectedNeed);
+      });
+      document.querySelectorAll("#energyButtons .choice-card").forEach(btn => {
+        btn.classList.toggle("selected", btn.textContent === selectedEnergy);
+      });
+    }
+
+    function shuffle(array) {
+      return array
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+    }
+
+    function generateBoard() {
+      const count = showMore ? 9 : 4;
+      let pool = [...practices[selectedNeed]];
+
+      if (selectedNeed !== "I’m not sure") {
+        pool = pool.concat(practices["Reset"]);
+      }
+
+      while (pool.length < count) {
+        pool = pool.concat(pool);
+      }
+
+      currentBoard = shuffle(pool).slice(0, count);
+      renderBoard();
+      document.getElementById("boardSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderBoard() {
+      const board = document.getElementById("board");
+      board.innerHTML = "";
+      board.className = "grid board-grid" + (showMore ? " more" : "");
+
+      currentBoard.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "care-card";
+        card.innerHTML = `
+          <span class="icon" aria-hidden="true">${item[0]}</span>
+          <p class="care-title">${item[1]}</p>
+          <p class="care-desc">${item[2]}</p>
+        `;
+        board.appendChild(card);
+      });
+    }
+
+    function toggleMoreChoices() {
+      showMore = !showMore;
+      document.getElementById("moreBtn").textContent = showMore ? "Show Fewer Choices" : "Show More Choices";
+      generateBoard();
+    }
+
+    function surpriseMe() {
+      const all = Object.values(practices).flat();
+      currentBoard = [shuffle(all)[0]];
+      showMore = false;
+      document.getElementById("moreBtn").textContent = "Show More Choices";
+      renderBoard();
+      document.getElementById("boardSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function saveBoard() {
+      const saved = {
+        board: currentBoard,
+        reflection: document.getElementById("reflection").value,
+        date: new Date().toISOString()
+      };
+      localStorage.setItem("restoreReconnectRenewBoard", JSON.stringify(saved));
+      alert("Saved on this device.");
+    }
+
+    function loadSavedBoard() {
+      const saved = localStorage.getItem("restoreReconnectRenewBoard");
+      if (!saved) return;
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.board && parsed.board.length) {
+          currentBoard = parsed.board;
+          renderBoard();
+        }
+        if (parsed.reflection) {
+          document.getElementById("reflection").value = parsed.reflection;
+        }
+      } catch (e) {
+        console.log("No saved board loaded.");
+      }
+    }
+
+    function insertPrompt(prompt) {
+      const textarea = document.getElementById("reflection");
+      textarea.value += (textarea.value ? "\n" : "") + prompt;
+      textarea.focus();
+    }
+
+    function generateMessage(type) {
+      document.getElementById("messageBox").textContent = messages[type];
+    }
+
+    function copyMessage() {
+      const text = document.getElementById("messageBox").textContent;
+      if (!text || text.includes("Choose a note")) {
+        alert("Choose a note type first.");
+        return;
+      }
+
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Message copied."))
+        .catch(() => alert("Copy did not work. You can highlight and copy the message manually."));
+    }
+
+    makeButtons();
+    generateBoard();
+    loadSavedBoard();
+  </script>
 </body>
 </html>
